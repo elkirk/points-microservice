@@ -13,8 +13,6 @@ import (
 )
 
 func main() {
-	r := chi.NewRouter()
-
 	// Setup in-memory storage
 	payers := make(models.TransactionStore, 0)
 	queue := make(models.PriorityQueue, 0)
@@ -25,8 +23,11 @@ func main() {
 		queue,
 	}
 
+	// Initialize the queue
 	heap.Init(&Controller.PriorityQueue)
 
+	// Create a new router and apply logger middlewar
+	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
 	r.Post("/add-transaction", Controller.AddHandler)

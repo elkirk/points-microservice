@@ -1,3 +1,7 @@
+// This package contains handler functions for http routes defined in main.go
+// Handler functions are methods that receive the Controller struct, so each handler
+// will have access to the in-memory TransactionStore and PriorityQueue, which are
+// defined in the models package.
 package controllers
 
 import (
@@ -18,11 +22,17 @@ type Controller struct {
 	models.PriorityQueue    // []*Transaction
 }
 
+// Store takes a Transaction and stores it in the controller's TransactionStore
 func (ctrl *Controller) Store(t models.Transaction) {
 	payer := strings.ToUpper(t.Payer.Payer)
 	ctrl.TransactionStore[payer] = append(ctrl.TransactionStore[payer], &t)
 }
 
+// AddHandler handles POST requests to the /add-transaction route.
+// It first checks that the request body has the right format by decoding
+// into a Transaction variable. If there is no error, it stores that Transaction
+// in the Controller's TransactionStore and pushes the Transaction to the
+// PriorityQueue
 func (ctrl *Controller) AddHandler(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var t models.Transaction
@@ -41,6 +51,9 @@ func (ctrl *Controller) AddHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// CheckEnoughPoints is called in SpendHandler. It checks TransactionStore
+// and returns True if there are enough points to cover the SpendRequest,
+// otherwise returns False
 func (ctrl *Controller) CheckEnoughPoints(spendAmount int) bool {
 	payerBalances := map[string]int{}
 	for _, payer := range ctrl.TransactionStore {
@@ -59,6 +72,14 @@ type SpendRequest struct {
 	Points int `json:"points"`
 }
 
+// SpendHandler handles POST requests to the /spend route. Spend requests are
+// fulfilled using transactions in the PriorityQueue. Transactions are popped
+// from the queue in order by timestamp, oldest first, and their points are
+// added to the spentPoints variable. Loop continues iterating over Transactions
+// in queue until spentPoints == SpendRequest.Points. When this condition is met,
+// loop exits and an updated transaction is added to the queue, if the final
+// Transaction has left-over points. Negative transactions representing expediture
+// are added to TransactionStore, so that payer balances reflect the spend.
 func (ctrl *Controller) SpendHandler(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var req SpendRequest
@@ -79,21 +100,20 @@ func (ctrl *Controller) SpendHandler(w http.ResponseWriter, r *http.Request) {
 
 	for spentPoints < req.Points {
 		item := heap.Pop(&ctrl.PriorityQueue)
-		transaction, ok := item.(models.Transaction)
+		transaction, ok := item.(*models.Transaction)
 		if !ok {
 			log.Printf("Item popped from queue doesn't look like a transaction: %v\n", item)
 		}
 
+		// If current transaction can't fulfill spend request, consume entire
+		// transaction and add a new transaction with inverse points to TransactionStore
 		if transaction.Points <= (req.Points - spentPoints) {
 			spendFulfiller[transaction.Payer.Payer] -= transaction.Points
 
-			// Transaction is removed from queue with Pop.
-			// New Transaction with inverse points value is
-			// added to Controller.Payers
 			now := time.Now()
 			t := models.Transaction{
 				Payer:     transaction.Payer,
-				Points:    transaction.Points,
+				Points:    -transaction.Points,
 				Timestamp: now,
 			}
 			ctrl.Store(t)
@@ -109,6 +129,8 @@ func (ctrl *Controller) SpendHandler(w http.ResponseWriter, r *http.Request) {
 
 			now := time.Now()
 
+			// t1 is the modified final transaction with preserved timestamp and updated
+			// points value, which is re-added to the PriorityQueue
 			t1 := &models.Transaction{
 				Payer:     transaction.Payer,
 				Points:    (transaction.Points - remainder),
@@ -116,6 +138,8 @@ func (ctrl *Controller) SpendHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			heap.Push(&ctrl.PriorityQueue, t1)
 
+			// t2 represents the negative transaction that fulfills the spend request
+			// and is added to TransactionStore
 			t2 := models.Transaction{
 				Payer:     transaction.Payer,
 				Points:    -remainder,
@@ -131,19 +155,19 @@ func (ctrl *Controller) SpendHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(spendFulfiller)
 }
 
-// checkStore returns the contents of TransactionsByPayer
+// CheckStore returns the contents of TransactionStore, which are grouped by Payer
 func (ctrl *Controller) CheckStore(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(ctrl.TransactionStore)
 }
 
-// checkQueue returns the contents of the queue
+// CheckQueue returns the contents of the queue, which will not be ordered.
 func (ctrl *Controller) CheckQueue(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(ctrl.PriorityQueue)
 }
 
-// checkQueue returns the contents of the queue
+// DrainQueue drains the queue in order of priority (oldest to newest).
 func (ctrl *Controller) DrainQueue(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	queueContents := make([]*models.Transaction, 0)
@@ -156,7 +180,7 @@ func (ctrl *Controller) DrainQueue(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(queueContents)
 }
 
-// GET balance/{payer}
+// BalanceByPayer returns points balance for a specific payer
 func (ctrl *Controller) BalanceByPayer(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	payer := strings.ToUpper(chi.URLParam(r, "payer"))
@@ -168,7 +192,7 @@ func (ctrl *Controller) BalanceByPayer(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(payerBalance)
 }
 
-// GET /balance
+// BalanceHandler returns all payer point balances
 func (ctrl *Controller) BalanceHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	payerBalances := map[string]int{}

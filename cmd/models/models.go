@@ -1,3 +1,6 @@
+// This package defines the core data structures used in the app.
+// PriorityQueue is a modified implementation of Google's example
+// https://pkg.go.dev/container/heap
 package models
 
 import (
@@ -64,49 +67,3 @@ func (pq *PriorityQueue) update(transaction *Transaction,
 	transaction.Timestamp = timestamp
 	heap.Fix(pq, transaction.index)
 }
-
-// This example creates a PriorityQueue with some items, adds and manipulates an item,
-// and then removes the items in priority order.
-// func Example_priorityQueue() {
-// 	// Some items and their priorities.
-// 	items := []string{
-// 		`{ "payer": "DANNON", "points": 1000, "timestamp": "2020-11-02T14:00:00Z" }`,
-// 		`{ "payer": "UNILEVER", "points": 200, "timestamp": "2020-10-31T11:00:00Z" }`,
-// 		`{ "payer": "DANNON", "points": -200, "timestamp": "2020-10-31T15:00:00Z" }`,
-// 		`{ "payer": "MILLER COORS", "points": 10000, "timestamp": "2020-11-01T14:00:00Z" }`,
-// 		`{ "payer": "DANNON", "points": 300, "timestamp": "2020-10-31T10:00:00Z" } `,
-// 	}
-//
-// 	// Create a priority queue, put the items in it, and
-// 	// establish the priority queue (heap) invariants.
-// 	pq := make(PriorityQueue, len(items))
-// 	i := 0
-// 	for item := range items {
-// 		decoder := json.NewDecoder(item)
-// 		var t Transaction
-// 		err := decoder.Decode(&t)
-// 		pq[i] = &Transaction{
-// 			value:    value,
-// 			priority: priority,
-// 			index:    i,
-// 		}
-// 		i++
-// 	}
-// 	heap.Init(&pq)
-//
-// 	// Insert a new item and then modify its priority.
-// 	item := &Item{
-// 		value:    "orange",
-// 		priority: 1,
-// 	}
-// 	heap.Push(&pq, item)
-// 	pq.update(item, item.value, 5)
-//
-// 	// Take the items out; they arrive in decreasing priority order.
-// 	for pq.Len() > 0 {
-// 		item := heap.Pop(&pq).(*Item)
-// 		fmt.Printf("%.2d:%s ", item.priority, item.value)
-// 	}
-// 	// Output:
-// 	// 05:orange 04:pear 03:banana 02:apple
-// }
