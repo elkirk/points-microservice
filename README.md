@@ -75,57 +75,60 @@ There are 5 endpoints that accept requests:
     curl -d { "points": 5000 } -X PUT localhost:3000/spend
     ```
 - `check` accepts GET requests and returns a list of JSON entries representing every transaction currently stored in the database. Hitting this endpoint after the requests described above will return:
-    ```
-    [
-    {
-        "timestamp": "2020-11-02T14:00:00",
-        "_id": 1,
-        "payer": "DANNON",
-        "points": 1000
-    },
-    {
-        "timestamp": "2020-10-31T11:00:00",
-        "_id": 2,
-        "payer": "UNILEVER",
-        "points": 200
-    },
-    {
-        "timestamp": "2020-10-31T15:00:00",
-        "_id": 3,
-        "payer": "DANNON",
-        "points": -200
-    },
-    {
-        "timestamp": "2020-11-01T14:00:00",
-        "_id": 4,
-        "payer": "MILLER COORS",
-        "points": 10000
-    },
-    {
-        "timestamp": "2020-10-31T10:00:00",
-        "_id": 5,
-        "payer": "DANNON",
-        "points": 300
-    },
-    {
-        "timestamp": "2022-08-19T16:18:01.859377",
-        "_id": 6,
-        "payer": "DANNON",
-        "points": -100
-    },
-    {
-        "timestamp": "2022-08-19T16:18:01.878487",
-        "_id": 7,
-        "payer": "UNILEVER",
-        "points": -200
-    },
-    {
-        "timestamp": "2022-08-19T16:18:01.885005",
-        "_id": 8,
-        "payer": "MILLER COORS",
-        "points": -4700
-    }
+    ```json
+{
+    "DANNON": [
+        {
+            "payer": "DANNON",
+            "points": 1000,
+            "timestamp": "2020-11-02T14:00:00Z"
+        },
+        {
+            "payer": "DANNON",
+            "points": -200,
+            "timestamp": "2020-10-31T15:00:00Z"
+        },
+        {
+            "payer": "DANNON",
+            "points": 300,
+            "timestamp": "2020-10-31T10:00:00Z"
+        },
+        {
+            "payer": "DANNON",
+            "points": -300,
+            "timestamp": "2022-10-05T15:41:57.806821329-06:00"
+        },
+        {
+            "payer": "DANNON",
+            "points": 200,
+            "timestamp": "2022-10-05T15:41:57.806822341-06:00"
+        }
+    ],
+    "MILLER COORS": [
+        {
+            "payer": "MILLER COORS",
+            "points": 10000,
+            "timestamp": "2020-11-01T14:00:00Z"
+        },
+        {
+            "payer": "MILLER COORS",
+            "points": -4700,
+            "timestamp": "2022-10-05T15:41:57.806822792-06:00"
+        }
+    ],
+    "UNILEVER": [
+        {
+            "payer": "UNILEVER",
+            "points": 200,
+            "timestamp": "2020-10-31T11:00:00Z"
+        },
+        {
+            "payer": "UNILEVER",
+            "points": -200,
+            "timestamp": "2022-10-05T15:41:57.80682196-06:00"
+        }
     ]
+}
     ```
     - Make a request with Postman or the following command:
     ```console
