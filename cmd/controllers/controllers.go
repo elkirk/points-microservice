@@ -42,9 +42,12 @@ func (ctrl *Controller) AddHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	if err := ctrl.CheckNotNegative(t.Payer.Payer, t.Points); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`Transaction not added because it would cause Payer's points to go negative.`))
+	if t.Points < 0 {
+		err := ctrl.CheckNotNegative(t.Payer.Payer, t.Points)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`Transaction not added because it would cause Payer's points to go negative.`))
+		}
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
