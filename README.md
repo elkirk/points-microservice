@@ -69,8 +69,8 @@ There are 5 endpoints that accept requests:
     }
     ]
     ```
-    - New records will be added to the database reflecting these negative transactions.
-    - Make a request with Postman or the following command:
+    New records will be added to the database reflecting these negative transactions.
+    Make a request with Postman or the following command:
     ```console
     curl -d { "points": 5000 } -X PUT localhost:3000/spend
     ```
