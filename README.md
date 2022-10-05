@@ -76,7 +76,7 @@ There are 5 endpoints that accept requests:
     ```
 - `check` accepts GET requests and returns a list of JSON entries representing every transaction currently stored in the database. Hitting this endpoint after the requests described above will return:
     ```json
-{
+  {
     "DANNON": [
         {
             "payer": "DANNON",
@@ -128,7 +128,7 @@ There are 5 endpoints that accept requests:
             "timestamp": "2022-10-05T15:41:57.80682196-06:00"
         }
     ]
-}
+  }
     ```
     - Make a request with Postman or the following command:
     ```console
