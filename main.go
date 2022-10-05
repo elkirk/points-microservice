@@ -33,10 +33,10 @@ func main() {
 	r.Post("/add-transaction", Controller.AddHandler)
 	r.Post("/spend", Controller.SpendHandler)
 	r.Get("/check", Controller.CheckStore)
-	r.Get("/queue", Controller.CheckQueue)
-	r.Get("/queue/drain", Controller.DrainQueue)
 	r.Get("/balance", Controller.BalanceHandler)
 	r.Get("/balance/{payer}", Controller.BalanceByPayer)
+	// r.Get("/queue", Controller.CheckQueue)
+	// r.Get("/queue/drain", Controller.DrainQueue)
 
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Page not found", http.StatusNotFound)

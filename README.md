@@ -24,7 +24,7 @@ Starting server on :3000
 
 ### Interacting with the app
 There are 5 endpoints that accept requests:
-- `add-transaction` accepts POST requests representing points transactions that have the format described below and created a database entry for each:
+- `add-transaction` accepts POST requests representing points transactions that have the format described below and adds them to in-memory data structures for storage and retrieval.
     ```
     { "payer": "DANNON", "points": 1000, "timestamp": "2020-11-02T14:00:00Z" }
     { "payer": "UNILEVER", "points": 200, "timestamp": "2020-10-31T11:00:00Z" }
@@ -37,7 +37,7 @@ There are 5 endpoints that accept requests:
     ```console
     curl -d "{ "payer": "DANNON", "points": 1000, "timestamp": "2020-11-02T14:00:00Z" }" -X POST localhost:3000/add-transaction
     ```
-- `balance` accepts GET requests and returns total point balances for each payer with at least one transaction in the database. Use Postman, or the following command:
+- `balance` accepts GET requests and returns total point balances for each payer with at least one transaction in the data store. Use Postman, or the following command:
     ```console
     curl localhost:3000/balance
     ```
@@ -69,7 +69,7 @@ There are 5 endpoints that accept requests:
     }
     ]
     ```
-    New records will be added to the database reflecting these negative transactions.
+    New records will be added to the data store reflecting these negative transactions.
     Make a request with Postman or the following command:
     ```console
     curl -d { "points": 5000 } -X PUT localhost:3000/spend
