@@ -32,7 +32,8 @@ There are 4 endpoints that accept requests:
     { "payer": "MILLER COORS", "points": 10000, "timestamp": "2020-11-01T14:00:00Z" }
     { "payer": "DANNON", "points": 300, "timestamp": "2020-10-31T10:00:00Z" }
     ```
-    - You can use Postman to make requests, or, from the command line (make sure the app is running first):
+You can use Postman to make requests, or, from the command line (make sure the app is running first):
+
     ```console
     curl -d "{ "payer": "DANNON", "points": 1000, "timestamp": "2020-11-02T14:00:00Z" }" -X POST localhost:3000/add-transaction
     ```
