@@ -94,6 +94,11 @@ type SpendRequest struct {
 	Points int `json:"points"`
 }
 
+type SpendFulfilled struct {
+	Payer  string `json:"payer"`
+	Points int    `json:"points"`
+}
+
 // SpendHandler handles POST requests to the /spend route. Spend requests are
 // fulfilled using transactions in the PriorityQueue. Transactions are popped
 // from the queue in order by timestamp, oldest first, and their points are
@@ -173,7 +178,11 @@ func (ctrl *Controller) SpendHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(spendFulfiller)
+	result := make([]SpendFulfilled, 0)
+	for key, value := range spendFulfiller {
+		result = append(result, SpendFulfilled{key, value})
+	}
+	json.NewEncoder(w).Encode(result)
 }
 
 // CheckStore returns the contents of TransactionStore, which are grouped by Payer
