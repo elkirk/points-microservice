@@ -130,7 +130,7 @@ There are 5 endpoints that accept requests:
     ]
   }
     ```
-    - Make a request with Postman or the following command:
+    Make a request with Postman or the following command:
     ```console
     curl localhost:3000/check
     ```
