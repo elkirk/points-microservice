@@ -29,7 +29,7 @@ Provide routes that:
   - Spend points using the rules above and return a list of 
 
     ```json
-    { "payer": <string>, "points": <integer> }
+    { "payer": "string", "points": integer }
     ``` 
     for each call.
 
