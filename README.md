@@ -72,7 +72,7 @@ There are 5 endpoints that accept requests:
     New records will be added to the data store reflecting these negative transactions.
     Make a request with Postman or the following command:
     ```console
-    curl -d { "points": 5000 } -X PUT localhost:3000/spend
+    curl -d { "points": 5000 } -X POST localhost:3000/spend
     ```
 - `check` accepts GET requests and returns a list of JSON entries representing every transaction currently stored in the database. Hitting this endpoint after the requests described above will return:
     ```json
