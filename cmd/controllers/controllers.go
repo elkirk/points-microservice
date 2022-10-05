@@ -7,6 +7,7 @@ package controllers
 import (
 	"container/heap"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -41,12 +42,32 @@ func (ctrl *Controller) AddHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	if err := ctrl.CheckNotNegative(t.Payer.Payer, t.Points); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`Transaction not added because it would cause Payer's points to go negative.`))
+	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 
 	ctrl.Store(t)
 	heap.Push(&ctrl.PriorityQueue, &t)
 
+}
+
+// CheckNotNegative is called in AddHandler when the to-be-added Transaction has
+// a negative points balance. It checks TransactionStore to verify the negative
+// Transaction will not result in a payer having a negative total points balance.
+func (ctrl *Controller) CheckNotNegative(payer string, points int) error {
+	payerBalances := map[string]int{}
+	for _, payer := range ctrl.TransactionStore {
+		for _, transaction := range payer {
+			payerBalances[transaction.Payer.Payer] += transaction.Points
+		}
+	}
+	if payerBalances[payer] < -points {
+		return errors.New("Transaction would cause Payer's points to go negative")
+	}
+	return nil
 }
 
 // CheckEnoughPoints is called in SpendHandler. It checks TransactionStore
