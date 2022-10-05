@@ -28,7 +28,7 @@ Provide routes that:
   - Add transactions for a specific payer and date.
   - Spend points using the rules above and return a list of 
 
-    ```json
+    ```
     { "payer": "string", "points": integer }
     ``` 
     for each call.
