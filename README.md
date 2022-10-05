@@ -47,12 +47,13 @@ You can use Postman to make requests, or, from the command line (make sure the a
     ```
 - `spend` accepts POST requests representing a points spend request that have the format described below. If there are enough points in the database to cover the spend, this endpoint returns JSON describing the payers and their contributions to the spend request. Points are spent oldest-to-newest. If there are not enough points to cover the request, a response will be returned with status code 422 indicating there are insufficient points.
 
-Requests have the format:
+Requests have the format
     ```
     { "points": 5000 }
     ```
 Since points are spent oldest-to-newest, the spend request described above will return the following:
-    ```
+
+    ```json
     [
     {
         "payer": "DANNON",
