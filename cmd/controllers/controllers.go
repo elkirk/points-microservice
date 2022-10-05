@@ -46,8 +46,6 @@ func (ctrl *Controller) AddHandler(w http.ResponseWriter, r *http.Request) {
 
 	ctrl.Store(t)
 	heap.Push(&ctrl.PriorityQueue, &t)
-	// item := heap.Pop(&ctrl.PriorityQueue).(*models.Transaction)
-	fmt.Printf("Length of queue: %+v\n", ctrl.PriorityQueue.Len())
 
 }
 
@@ -93,7 +91,6 @@ func (ctrl *Controller) SpendHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{"error":"Not enough points to cover spend request"}`))
 		return
 	}
-	log.Printf("Received POST: %+v\n", req)
 
 	spendFulfiller := map[string]int{}
 	spentPoints := 0
