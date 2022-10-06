@@ -30,6 +30,7 @@ func (ctrl *Controller) Store(t models.Transaction) {
 }
 
 // AddHandler handles POST requests to the /add-transaction route.
+//
 // It first checks that the request body has the right format by decoding
 // into a Transaction variable. If there is no error, it stores that Transaction
 // in the Controller's TransactionStore and pushes the Transaction to the
@@ -99,14 +100,16 @@ type SpendFulfilled struct {
 	Points int    `json:"points"`
 }
 
-// SpendHandler handles POST requests to the /spend route. Spend requests are
-// fulfilled using transactions in the PriorityQueue. Transactions are popped
-// from the queue in order by timestamp, oldest first, and their points are
-// added to the spentPoints variable. Loop continues iterating over Transactions
-// in queue until spentPoints == SpendRequest.Points. When this condition is met,
-// loop exits and an updated transaction is added to the queue, if the final
-// Transaction has left-over points. Negative transactions representing expediture
-// are added to TransactionStore, so that payer balances reflect the spend.
+// SpendHandler handles POST requests to the /spend route.
+//
+// Spend requests are fulfilled using transactions in the PriorityQueue.
+// Transactions are popped from the queue in order by timestamp, oldest first,
+// and their points are added to the spentPoints variable. Loop continues
+// iterating over Transactions in queue until spentPoints == SpendRequest.Points.
+// When this condition is met, loop exits and an updated transaction is added to
+// the queue, if the final Transaction has left-over points. Negative transactions
+// representing expediture are added to TransactionStore, so that payer balances
+// reflect the spend.
 func (ctrl *Controller) SpendHandler(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var req SpendRequest
@@ -185,19 +188,25 @@ func (ctrl *Controller) SpendHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(result)
 }
 
-// CheckStore returns the contents of TransactionStore, which are grouped by Payer
+// CheckStore handles GET requests to the /check route.
+//
+// Returns the contents of TransactionStore, which are grouped by Payer.
 func (ctrl *Controller) CheckStore(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(ctrl.TransactionStore)
 }
 
-// CheckQueue returns the contents of the queue, which will not be ordered.
+// CheckQueue handles GET requests to the /queue route.
+//
+// Returns the contents of the queue, which will not be ordered.
 func (ctrl *Controller) CheckQueue(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(ctrl.PriorityQueue)
 }
 
-// DrainQueue drains the queue in order of priority (oldest to newest).
+// DrainQueue handles GET requests to the /queue/drain route.
+//
+// Drains the queue in order of priority (oldest to newest).
 func (ctrl *Controller) DrainQueue(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	queueContents := make([]*models.Transaction, 0)
@@ -210,7 +219,9 @@ func (ctrl *Controller) DrainQueue(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(queueContents)
 }
 
-// BalanceByPayer returns points balance for a specific payer
+// BalanceByPayer handles GET requests to the /balance/{payer} route.
+//
+// Returns points balance for a specific payer.
 func (ctrl *Controller) BalanceByPayer(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	payer := strings.ToUpper(chi.URLParam(r, "payer"))
@@ -222,7 +233,9 @@ func (ctrl *Controller) BalanceByPayer(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(payerBalance)
 }
 
-// BalanceHandler returns all payer point balances
+// BalanceHandler handles GET requess to the /balance route.
+//
+// Returns all payer point balances.
 func (ctrl *Controller) BalanceHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	payerBalances := map[string]int{}
