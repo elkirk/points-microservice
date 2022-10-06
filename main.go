@@ -26,7 +26,7 @@ func main() {
 	// Initialize the queue
 	heap.Init(&Controller.PriorityQueue)
 
-	// Create a new router and apply logger middlewar
+	// Create a new router and apply logger middleware
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
